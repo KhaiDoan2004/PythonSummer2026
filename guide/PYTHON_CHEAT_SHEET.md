@@ -248,4 +248,78 @@ if not find:
 ```
 
 ---
+
+## 11. ĐIỀU KHIỂN LUỒNG & LOGIC
+
+### Lệnh `continue` (Bỏ qua sớm / Early Exit)
+Giúp chương trình bỏ qua vòng lặp hiện tại ngay khi phát hiện lỗi, thay vì lồng nhiều khối `if/else`.
+```python
+for x in range(5):
+    if x % 2 == 0:
+        continue  # Gặp số chẵn thì bỏ qua luôn, vòng ngược lên
+    print("Số lẻ:", x)
+```
+
+### Tư duy cờ (Flag) đúng chuẩn
+Khi cần kiểm tra một tính chất mà "tất cả các phần tử phải thỏa mãn điều kiện", hãy luôn đặt niềm tin (`True`) từ đầu. Khi gặp lỗi thì gán `False` và `break`. Đừng làm ngược lại!
+```python
+# Sai: Không gán True bao giờ
+check = False 
+for x in a:
+    if x % 2 == 0: check = False
+
+# Đúng chuẩn:
+check = True  # Luôn tin tưởng
+for x in a:
+    if x % 2 != 0: 
+        check = False  # Bắt quả tang sai
+        break          # Phạt rút thẻ đỏ luôn
+```
+
+---
+
+## 12. ASCII VÀ KHOẢNG CÁCH KÝ TỰ (ord, abs)
+
+### Lấy mã thứ tự ASCII của 1 ký tự
+```python
+ord('a')                      # 97
+ord('c')                      # 99
+```
+
+### Tính khoảng cách giữa 2 ký tự (Trị tuyệt đối)
+Dùng kết hợp `abs()` (Absolute) và `ord()`.
+```python
+kc = abs(ord('a') - ord('c')) # |97 - 99| = 2
+```
+
+---
+
+## 13. TUYỆT KỸ ĐẢO NGƯỢC (Đảo chuỗi / Đảo mảng)
+
+### Cách Pythonic nhất: Dùng Slicing `[::-1]`
+Đây là "trick" ngắn nhất vũ trụ của Python, áp dụng được cho cả Chuỗi (String) và Mảng (List).
+```python
+# Đảo chuỗi
+s = "abcde"
+s_dao = s[::-1]               # "edcba"
+
+# Đảo mảng
+a = [1, 2, 3, 4]
+a_dao = a[::-1]               # [4, 3, 2, 1]
+```
+
+### Đảo ngay tại chỗ (chỉ dành cho Mảng)
+```python
+a = [1, 2, 3]
+a.reverse()                   # Mảng a bị biến đổi thẳng thành [3, 2, 1]
+```
+
+### Hàm `reversed()` (Dành cho duyệt vòng lặp)
+```python
+s = "abc"
+for char in reversed(s):
+    print(char)               # In ra: c, b, a
+```
+
+---
 *Ghi chú: File này sẽ liên tục được cập nhật khi Chủ nhân học thêm cú pháp mới!*
