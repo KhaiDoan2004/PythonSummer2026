@@ -111,9 +111,11 @@ for i in a:
 so_lan = a.count(3)           # Đếm số 3 xuất hiện bao nhiêu lần trong a
 ```
 
-### Đếm 1 ký tự trong chuỗi
+### Đếm 1 ký tự / xâu con trong chuỗi (KHÔNG trùm lên nhau)
 ```python
-so_lan = s.count('C')         # Đếm chữ C trong chuỗi s
+s = "121212"
+s.count('1')                  # Đếm số chữ '1' xuất hiện
+s.count("121")                # Trả về 1 (vì tìm thấy "121" ở đầu, đoạn sau còn "212" không khớp)
 ```
 
 ### Đếm tất cả phần tử bằng Counter
@@ -319,6 +321,122 @@ a.reverse()                   # Mảng a bị biến đổi thẳng thành [3, 2
 s = "abc"
 for char in reversed(s):
     print(char)               # In ra: c, b, a
+```
+
+---
+
+## 14. BẢN CHẤT BỘ NHỚ: C++ vs PYTHON (Name Tag)
+
+### C++ (Cái Hộp)
+Trong C++, biến là một **cái hộp cố định** trong RAM. Khi khai báo `int a`, máy cắt sẵn một cái hộp dung lượng 4 bytes. Nếu nhét dữ liệu lớn hơn vào (ví dụ chuỗi 1000 chữ số), hộp sẽ vỡ tung (Tràn bộ nhớ - Overflow). Khi cập nhật biến, máy phải bới cái hộp đó lên, đổ dữ liệu cũ ra và nhét dữ liệu mới vào.
+
+### Python (Nhãn Dán)
+Trong Python, biến chỉ là một **"Cái Nhãn Dán" (Name Tag)**.
+- Khi gán `y = "123"`, Python đúc ra cục dữ liệu `"123"` ở đâu đó trong RAM, rồi dán nhãn `y` lên.
+- Khi cập nhật `y = "456"`, Python đúc ra cục dữ liệu `"456"` mới tinh ở một nơi khác, bóc nhãn `y` ở chỗ cũ dán sang chỗ mới.
+- Cục `"123"` cũ bị bỏ rơi sẽ bị "Người thu gom rác" (Garbage Collector) của Python tự động hốt đi tiêu hủy để dọn dẹp RAM.
+👉 Do đó, việc tái sử dụng biến, cập nhật biến, ép kiểu biến (từ `string` sang `int` rồi lại sang `string`) cực kỳ an toàn và không bao giờ rác bộ nhớ!
+
+---
+
+## 15. BẪY VÒNG LẶP FOR (Python vs C++)
+
+### Trong C++ (Cộng dồn)
+`for (int i = 0; i < n; i++)` hoạt động dựa trên việc **cộng dồn**. Nếu bên trong vòng lặp ta tự ý cập nhật `i = i + 3`, vòng lặp vẫn tôn trọng giá trị đó và chạy tiếp từ `i` mới. Tính năng "nhảy cóc" này rất tiện.
+
+### Trong Python (Băng chuyền)
+`for i in range(10)` hoạt động như một **băng chuyền**. `range(10)` đã sản xuất sẵn 10 viên bi từ `0` đến `9`.
+Cứ mỗi lần chạy lại vòng mới, cái máy `for` sẽ bốc viên bi tiếp theo từ băng chuyền và **tự động gán đè lên biến `i`**. 
+Mọi nỗ lực cập nhật `i = i + 3` của ngài ở vòng trước đều bị cái máy `for` này tàn nhẫn ghi đè mất!
+
+👉 **Giải pháp:** Nếu muốn tự tay cập nhật biến đếm (bước nhảy không đều), HÃY DÙNG VÒNG LẶP `while`:
+```python
+i = 0
+while i < len(s):
+    if điều_kiện_khớp:
+        i += 3  # Nhảy cóc 3 ô thoải mái!
+    else:
+        i += 1  # Nhích 1 ô
+```
+
+---
+
+## 16. KỸ THUẬT HAI CON TRỎ (Two Pointers) & XẢ BỘ ĐỆM (Buffer Flush)
+
+Đây là tuyệt kỹ cực kỳ phổ biến để xử lý mảng/chuỗi. Biến thể **Neo và Quét (Anchor & Scan)** giúp ta bóc tách các nhóm dữ liệu rời rạc dựa trên một điều kiện "đứt gãy".
+
+### Cấu trúc cơ bản
+- **Mỏ Neo (`start`)**: Đứng im ở vị trí đầu của nhóm hiện tại.
+- **Tia Quét (`i`)**: Chạy vòng `for` thăm dò phía trước. Khi gặp vạch đứt gãy, nó ra lệnh "Cắt", sau đó lập tức rút Mỏ Neo cắm sang vị trí mới.
+
+### Bắt buộc: Xả Bộ Đệm (Buffer Flush)
+Vì nhát cắt chỉ xảy ra ở *BÊN TRONG* mảng, phần đuôi mảng cuối cùng sẽ bị "kẹt" lại (vì không còn nhát cắt nào phía sau để xả nó ra). Ta luôn phải có một lệnh vét đáy nằm **BÊN NGOÀI** vòng lặp.
+
+### Ví dụ Code:
+```python
+a = [1, 2, 3, 4, 6, 7, 9]
+k = 1
+start = 0
+
+for i in range(len(a) - 1):
+    # Dấu hiệu đứt gãy
+    if a[i+1] - a[i] > k:
+        nhom = a[start : i+1]      # Cắt nhóm
+        print(nhom)
+        start = i + 1              # Nhổ mỏ neo cắm sang vị trí mới
+
+# Lệnh Buffer Flush (Luôn phải có để vét nốt khúc cuối)
+print(a[start : len(a)]) 
+```
+
+---
+
+## 17. ĐỊNH DẠNG CHUỖI SIÊU TỐC (F-String)
+
+F-String là "ma thuật" in chuỗi thanh lịch nhất của Python, dẹp bỏ mọi dấu phẩy và phép cộng chuỗi rườm rà.
+Chỉ cần đặt chữ `f` trước dấu ngoặc kép, và bọc biến vào trong `{ }`.
+
+```python
+i = 2
+j = 1
+# In ra: Vi tri [2][1]
+print(f"Vi tri [{i}][{j}]")
+
+ten = "Lữ Bố"
+vu_khi = "Phương Thiên Họa Kích"
+print(f"Tướng quân {ten} vung {vu_khi} ra trận!")
+```
+
+---
+
+## 18. NHỮNG CÁI BẪY CHẾT NGƯỜI VÀ MẸO NHỎ
+
+### Bẫy hàm `range()` thiếu 1 bước
+Hàm `range(start, end)` luôn luôn **dừng lại ở `end - 1`**. 
+Lỗi kinh điển nhất là vòng lặp kiểm tra số nguyên tố:
+```python
+# SAI: Căn bậc 2 của 9 là 3. range(2, 3) chỉ chạy đến 2 rồi dừng. 9 bị kết luận là số nguyên tố!
+for i in range(2, math.isqrt(n)):
+
+# ĐÚNG: Phải cộng thêm 1 để vòng lặp chạm tới được phần nguyên của căn bậc 2.
+for i in range(2, math.isqrt(n) + 1):
+```
+
+### Sử dụng `-1` làm Cờ hiệu (Sentinel Value)
+Khi tìm kiếm một vị trí (index) hoặc một giá trị dương (ví dụ tìm số Max, tìm số nguyên tố), người ta thường khởi tạo biến lưu trữ bằng `-1`. 
+Số `-1` đóng vai trò là Cờ hiệu báo rằng "Tôi chưa tìm thấy gì cả".
+Đến cuối chương trình, nếu biến đó vẫn là `-1`, ta kết luận `NOT FOUND`.
+
+```python
+max_prime = -1
+for x in a:
+    if x > max_prime and checksonguyento(x):
+        max_prime = x
+
+if max_prime == -1:
+    print("NOT FOUND")
+else:
+    print(max_prime)
 ```
 
 ---
