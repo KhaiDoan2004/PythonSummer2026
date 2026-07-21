@@ -1,6 +1,3 @@
-# PYKT076 - Danh sách phim
-# [!] CHƯA HIỂU - Chép code nộp lên codePtit, CẦN HỌC LẠI OOP để hiểu bản chất
-
 n, m = map(int, input().split())
 
 genres = {}
